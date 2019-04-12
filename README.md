@@ -26,7 +26,7 @@ git clone https://github.com/yromano/cqr
 
 ## Usage
 
-Please refer to [synthetic_data_example.ipynb](`synthetic_data_example.ipynb`) and [real_data_example.ipynb](`real_data_example.ipynb`) for usage.
+Please refer to [synthetic_data_example.ipynb](synthetic_data_example.ipynb) and [real_data_example.ipynb](real_data_example.ipynb) for usage.
 
 ## Reproducible Research
 
