@@ -8,16 +8,17 @@ Conformal prediction is a technique for constructing prediction intervals that a
 
 ## Getting Started
 
-This package is implemented in python and relies on the github repository available at https://github.com/donlnz/nonconformist.
+This package is implemented in python. Our implementation is a modified version of the nonconformist package available at https://github.com/donlnz/nonconformist. While our CQR package is self-contained, one may refer to the nonconformist repository to view other applications of conformal prediction.  
 
 ### Prerequisites
 
-* Python
+* python
 * numpy
 * scipy
 * scikit-learn
 * scikit-garden
 * pytorch
+* pandas
 
 ### Installing
 
