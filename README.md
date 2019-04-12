@@ -1,62 +1,37 @@
-# nonconformist
+# Conformalized Quantile Regression
 
-Python implementation of the conformal prediction framework [1].
+Conformal prediction is a technique for constructing prediction intervals that attain valid coverage in finite samples, without making distributional assumptions. Despite this appeal, existing conformal methods can be unnecessarily conservative because they form intervals of constant or weakly varying length across the input space. **Conformalized quantile regression (CQR)** [1] is a new method that is fully adaptive to heteroscedasticity and often more efficient than other conformal methods. It combines conformal prediction with classical quantile regression, inheriting the advantages of both. CQR is also supported by a theoretical guarantee of valid coverage.
 
-Primarily to be used as an extension to the scikit-learn library.
+[1] Yaniv Romano, Evan Patterson, and Emmanuel Candes, “Conformalized quantile regression.” 2019.
 
-API documentation: http://donlnz.github.io/nonconformist/
+## Getting Started
 
-(API documentation is currently severely deprecated; for instructions on basic usage,
-please refer to [README.ipynb](https://github.com/donlnz/nonconformist/blob/master/README.ipynb), and the running examples
-available under [/examples/](https://github.com/donlnz/nonconformist/tree/master/examples) in the repository.)
+This package is implemented in python and relies on the github repository available at https://github.com/donlnz/nonconformist.
 
-# Installation
+### Prerequisites
 
-## Dependencies
-
-nonconformist requires:
-
-* Python (tested under Python 3.5)
+* Python
 * numpy
 * scipy
 * scikit-learn
+* scikit-garden
+* pytorch
 
-## User installation
+### Installing
 
-The easiest way to install the latest release version is via ```pip```:
-```bash
-pip install nonconformist
-```
 The development version is available here on github:
 ```bash
-git clone https://github.com/donlnz/nonconformist
+git clone https://github.com/yromano/cqr
 ```
 
+## Usage
 
-# TODO
+Please refer to [synthetic_data_example.ipynb](`synthetic_data_example.ipynb`) and [real_data_example.ipynb](`real_data_example.ipynb`) for usage.
 
-* Exchangeability testing [2].
-* Interpolated p-values [3,4].
-* Conformal prediction trees [5].
-* Venn predictors [?]
-* Venn-ABERS predictors [?]
-* Nonparametric distribution prediction [?]
+## Reproducible Research
 
-[1] Vovk, V., Gammerman, A., & Shafer, G. (2005). Algorithmic learning in a random world.
-Springer Science & Business Media.
+The code available under /reproducible_experiments/ in the repository replicates the experimental results in [1].
 
-[2] Fedorova, V., Gammerman, A., Nouretdinov, I., & Vovk, V. (2012).
-Plug-in martingales for testing exchangeability on-line. In Proceedings
-of the 29th International Conference on Machine Learning (ICML-12) (pp. 1639-1646).
+## License
 
-[3] Carlsson, L., Ahlberg, E., Boström, H., Johansson, U., Linusson, & H. (2015).
-Modifications to p-values of Conformal Predictors. In Proceedings of the 3rd
-International Symposium on Statistical Learning and Data Sciences (SLDS 2015). (In press).
-
-[4] Johansson, U., Ahlberg, E., Boström, H., Carlsson, L., Linusson, H., Sönströd, C. (2015).
-Handling Small Calibration Sets in Mondrian Inductive Conformal Regressors. In Proceedings of
-the 3rd International Symposium on Statistical Learning and Data Sciences (SLDS 2015). (In press).
-
-[5] Johansson, U., Sönströd, C., Linusson, H., & Boström, H. (2014, October).
-Regression trees for streaming data with local performance guarantees.
-In Big Data (Big Data), 2014 IEEE International Conference on (pp. 461-470). IEEE.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

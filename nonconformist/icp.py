@@ -99,11 +99,11 @@ class BaseIcp(BaseEstimator):
 				idx = category_map == cond
 				cal_scores = self.nc_function.score(self.cal_x[idx, :],
 				                                    self.cal_y[idx])
-				self.cal_scores[cond] = np.sort(cal_scores)[::-1]
+				self.cal_scores[cond] = np.sort(cal_scores,0)[::-1]
 		else:
 			self.categories = np.array([0])
 			cal_scores = self.nc_function.score(self.cal_x, self.cal_y)
-			self.cal_scores = {0: np.sort(cal_scores)[::-1]}
+			self.cal_scores = {0: np.sort(cal_scores,0)[::-1]}
 
 	def _calibrate_hook(self, x, y, increment):
 		pass

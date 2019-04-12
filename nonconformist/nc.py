@@ -5,6 +5,7 @@ Nonconformity functions.
 """
 
 # Authors: Henrik Linusson
+# Yaniv Romano modified RegressorNc class to include CQR
 
 from __future__ import division
 
@@ -17,6 +18,7 @@ from nonconformist.base import OobClassifierAdapter, OobRegressorAdapter
 # -----------------------------------------------------------------------------
 # Error functions
 # -----------------------------------------------------------------------------
+
 
 class ClassificationErrFunc(object):
 	"""Base class for classification model error functions.
@@ -195,7 +197,25 @@ class SignErrorErrFunc(RegressionErrFunc):
 		lower = max(min(lower, nc.size - 1), 0)
 		return np.vstack([-nc[lower], nc[upper]])
 
+# CQR error function
+class QuantileRegErrFunc(RegressionErrFunc):
+    def __init__(self):
+        super(QuantileRegErrFunc, self).__init__()
 
+    def apply(self, prediction, y):
+        y_lower = prediction[:,0]
+        y_upper = prediction[:,-1]
+        error_low = y - y_lower
+        error_high = y_upper - y
+        err = abs(error_low)*(error_low<0) + abs(error_high)*(error_high<0)
+        return err
+
+    def apply_inverse(self, nc, significance):
+        nc = np.sort(nc)[::-1]
+        border = int(np.floor(significance * (nc.size + 1))) - 1
+        border = min(max(border, 0), nc.size - 1)
+        return np.vstack([nc[border], nc[border]])
+    
 # -----------------------------------------------------------------------------
 # Base nonconformity scorer
 # -----------------------------------------------------------------------------
@@ -224,12 +244,30 @@ class RegressorNormalizer(BaseScorer):
 	def fit(self, x, y):
 		residual_prediction = self.base_model.predict(x)
 		residual_error = np.abs(self.err_func.apply(residual_prediction, y))
-		residual_error += 0.00001 # Add small term to avoid log(0)
-		log_err = np.log(residual_error)
+		
+		######################################################################
+		# Optional: use logarithmic function as in the original implementation
+		# available in https://github.com/donlnz/nonconformist
+		#
+		# CODE:
+		# residual_error += 0.00001 # Add small term to avoid log(0)
+		# log_err = np.log(residual_error)
+		######################################################################
+		
+		log_err = residual_error
 		self.normalizer_model.fit(x, log_err)
 
 	def score(self, x, y=None):
-		norm = np.exp(self.normalizer_model.predict(x))
+		
+		######################################################################
+		# Optional: use logarithmic function as in the original implementation
+		# available in https://github.com/donlnz/nonconformist
+		#
+		# CODE:
+		# norm = np.exp(self.normalizer_model.predict(x))
+		######################################################################
+        
+		norm = self.normalizer_model.predict(x)
 		return norm
 
 
@@ -308,7 +346,7 @@ class BaseModelNc(BaseScorer):
 		the normalized nonconformity function approaches a non-normalized
 		equivalent.
 	"""
-	def __init__(self, model, err_func, normalizer=None, beta=0):
+	def __init__(self, model, err_func, normalizer=None, beta=1e-6):
 		super(BaseModelNc, self).__init__()
 		self.err_func = err_func
 		self.model = model
@@ -368,8 +406,11 @@ class BaseModelNc(BaseScorer):
 			norm = self.normalizer.score(x) + self.beta
 		else:
 			norm = np.ones(n_test)
-
-		return self.err_func.apply(prediction, y) / norm
+		if prediction.ndim > 1:
+		    ret_val = self.err_func.apply(prediction, y)
+		else:
+		    ret_val = self.err_func.apply(prediction, y) / norm
+		return ret_val
 
 
 # -----------------------------------------------------------------------------
@@ -412,7 +453,7 @@ class ClassifierNc(BaseModelNc):
 	             model,
 	             err_func=MarginErrFunc(),
 	             normalizer=None,
-	             beta=0):
+	             beta=1e-6):
 		super(ClassifierNc, self).__init__(model,
 		                                   err_func,
 		                                   normalizer,
@@ -457,7 +498,7 @@ class RegressorNc(BaseModelNc):
 	             model,
 	             err_func=AbsErrorErrFunc(),
 	             normalizer=None,
-	             beta=0):
+	             beta=1e-6):
 		super(RegressorNc, self).__init__(model,
 		                                  err_func,
 		                                  normalizer,
@@ -502,13 +543,16 @@ class RegressorNc(BaseModelNc):
 			intervals = np.zeros((x.shape[0], 2))
 			err_dist = self.err_func.apply_inverse(nc, significance)
 			err_dist = np.hstack([err_dist] * n_test)
-			err_dist *= norm
-
-			intervals[:, 0] = prediction - err_dist[0, :]
-			intervals[:, 1] = prediction + err_dist[1, :]
+			if prediction.ndim > 1: # CQR
+				intervals[:, 0] = prediction[:,0] - err_dist[0, :]
+				intervals[:, 1] = prediction[:,-1] + err_dist[1, :]
+			else: # regular conformal prediction
+				err_dist *= norm
+				intervals[:, 0] = prediction - err_dist[0, :]
+				intervals[:, 1] = prediction + err_dist[1, :]
 
 			return intervals
-		else:
+		else: # Not tested for CQR
 			significance = np.arange(0.01, 1.0, 0.01)
 			intervals = np.zeros((x.shape[0], 2, significance.size))
 
