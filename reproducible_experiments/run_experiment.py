@@ -5,7 +5,7 @@ import random
 import numpy as np
 import pandas as pd
 from cqr import helper
-from experiments import datasets
+from datasets import datasets
 from sklearn import linear_model
 from nonconformist.nc import NcFactory
 from nonconformist.nc import RegressorNc
@@ -24,11 +24,15 @@ if os.path.isdir('/scratch'):
     local_machine = 0
 else:
     local_machine = 1
+    
 
 if local_machine:
-    plot_results = True
+    base_dataset_path = '/Users/romano/mydata/regression_data/'
 else:
-    plot_results = False
+    base_dataset_path = '/scratch/users/yromano/data/regression_data/'
+
+
+plot_results = False
 
 
 def run_experiment(dataset_name,
@@ -146,7 +150,7 @@ def run_experiment(dataset_name,
     sys.stdout.flush()
     
     # load the dataset
-    X, y = datasets.GetDataset(dataset_name)
+    X, y = datasets.GetDataset(dataset_name, base_dataset_path)
 
     # Dataset is divided into test and train data based on test_ratio parameter
     X_train, X_test, y_train, y_test = train_test_split(X,

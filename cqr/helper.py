@@ -1,5 +1,4 @@
 
-import os
 import sys
 import torch
 import numpy as np
@@ -9,12 +8,6 @@ from cqr import tune_params_cv
 from nonconformist.cp import IcpRegressor
 from nonconformist.base import RegressorAdapter
 from skgarden import RandomForestQuantileRegressor
-
-if os.path.isdir('/scratch'):
-    local_machine = 0
-else:
-    local_machine = 1
-    import matplotlib.pyplot as plt
 
 if torch.cuda.is_available():
     device = "cuda:0"
@@ -123,44 +116,46 @@ def plot_func_data(y_test,y_lower,y_upper,name=""):
     
     """
     
-    if local_machine:
-        interval = y_upper - y_lower
-        sort_ind = np.argsort(interval)
-        y_test_sorted = y_test[sort_ind]
-        upper_sorted = y_upper[sort_ind]
-        lower_sorted = y_lower[sort_ind]
-        mean = (upper_sorted + lower_sorted) / 2
+    # allowed to import graphics
+    import matplotlib.pyplot as plt
 
-        # Center such that the mean of the prediction interval is at 0.0
-        y_test_sorted -= mean
-        upper_sorted -= mean
-        lower_sorted -= mean
+    interval = y_upper - y_lower
+    sort_ind = np.argsort(interval)
+    y_test_sorted = y_test[sort_ind]
+    upper_sorted = y_upper[sort_ind]
+    lower_sorted = y_lower[sort_ind]
+    mean = (upper_sorted + lower_sorted) / 2
 
-        plt.plot(y_test_sorted, "ro")
-        plt.fill_between(
-            np.arange(len(upper_sorted)), lower_sorted, upper_sorted, alpha=0.2, color="r",
-            label="Pred. interval")
-        plt.xlabel("Ordered samples")
-        plt.ylabel("Values and prediction intervals")
+    # Center such that the mean of the prediction interval is at 0.0
+    y_test_sorted -= mean
+    upper_sorted -= mean
+    lower_sorted -= mean
 
-        plt.title(name)
-        plt.show()
+    plt.plot(y_test_sorted, "ro")
+    plt.fill_between(
+        np.arange(len(upper_sorted)), lower_sorted, upper_sorted, alpha=0.2, color="r",
+        label="Pred. interval")
+    plt.xlabel("Ordered samples")
+    plt.ylabel("Values and prediction intervals")
 
-        interval = y_upper - y_lower
-        sort_ind = np.argsort(y_test)
-        y_test_sorted = y_test[sort_ind]
-        upper_sorted = y_upper[sort_ind]
-        lower_sorted = y_lower[sort_ind]
+    plt.title(name)
+    plt.show()
 
-        plt.plot(y_test_sorted, "ro")
-        plt.fill_between(
-            np.arange(len(upper_sorted)), lower_sorted, upper_sorted, alpha=0.2, color="r",
-            label="Pred. interval")
-        plt.xlabel("Ordered samples by response")
-        plt.ylabel("Values and prediction intervals")
+    interval = y_upper - y_lower
+    sort_ind = np.argsort(y_test)
+    y_test_sorted = y_test[sort_ind]
+    upper_sorted = y_upper[sort_ind]
+    lower_sorted = y_lower[sort_ind]
 
-        plt.title(name)
-        plt.show()
+    plt.plot(y_test_sorted, "ro")
+    plt.fill_between(
+        np.arange(len(upper_sorted)), lower_sorted, upper_sorted, alpha=0.2, color="r",
+        label="Pred. interval")
+    plt.xlabel("Ordered samples by response")
+    plt.ylabel("Values and prediction intervals")
+
+    plt.title(name)
+    plt.show()
 
 ###############################################################################
 # Deep conditional mean regression

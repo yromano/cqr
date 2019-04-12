@@ -1,22 +1,15 @@
-import os
+
 import numpy as np
 import pandas as pd
 
-if os.path.isdir('/scratch'):
-    local_machine = 0
-else:
-    local_machine = 1
-    
-base_path = '/scratch/users/yromano/data/regression_data/'
-if local_machine:
-    base_path = '/Users/romano/mydata/regression_data/'
 
-def GetDataset(name):
+def GetDataset(name, base_path):
     """ Load a dataset
     
     Parameters
     ----------
     name : string, dataset name
+    base_path : string, e.g. "path/to/datasets/directory/"
     
     Returns
     -------
