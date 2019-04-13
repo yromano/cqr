@@ -26,7 +26,7 @@ Part of the code is a taken from the nonconformist package available at https://
 
 The development version is available here on github:
 ```bash
-git clone https://github.com/yromano/cqr
+git clone https://github.com/yromano/cqr.git
 ```
 
 ## Usage
