@@ -20,17 +20,18 @@ from sklearn.model_selection import train_test_split
 
 pd.set_option('precision', 3)
 
-if os.path.isdir('/scratch'):
-    local_machine = 0
-else:
-    local_machine = 1
+#if os.path.isdir('/scratch'):
+#    local_machine = 0
+#else:
+#    local_machine = 1
+#
+#
+#if local_machine:
+#    base_dataset_path = '/Users/romano/mydata/regression_data/'
+#else:
+#    base_dataset_path = '/scratch/users/yromano/data/regression_data/'
 
-
-if local_machine:
-    base_dataset_path = '/Users/romano/mydata/regression_data/'
-else:
-    base_dataset_path = '/scratch/users/yromano/data/regression_data/'
-
+base_dataset_path = './datasets/'
 
 plot_results = False
 
@@ -148,10 +149,14 @@ def run_experiment(dataset_name,
 
     print(dataset_name)
     sys.stdout.flush()
-
-    # load the dataset
-    X, y = datasets.GetDataset(dataset_name, base_dataset_path)
-
+    
+    try:
+        # load the dataset
+        X, y = datasets.GetDataset(dataset_name, base_dataset_path)
+    except:
+        print("CANNOT LOAD DATASET!")
+        return
+    
     # Dataset is divided into test and train data based on test_ratio parameter
     X_train, X_test, y_train, y_test = train_test_split(X,
                                                         y,
@@ -543,11 +548,16 @@ def run_experiment(dataset_name,
         if not os.path.exists(outdir):
             os.mkdir(outdir)
 
-
         out_name = outdir + 'results.csv'
+
         df = pd.DataFrame({'name': dataset_name_vec,
                            'method': method_vec,
                            coverage_str : coverage_vec,
                            'Avg. Length' : length_vec,
                            'seed': seed_vec})
+    
+        if os.path.isfile(out_name):
+            df2 = pd.read_csv(out_name)
+            df = pd.concat([df2, df], ignore_index=True)
+    
         df.to_csv(out_name, index=False)

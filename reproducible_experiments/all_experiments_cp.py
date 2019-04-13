@@ -3,7 +3,7 @@
 ###############################################################################
 
 import numpy as np
-from run_experiment import run_experiment
+from reproducible_experiments.run_experiment import run_experiment
 
 # list methods to test
 test_methods = ['linear_model',
