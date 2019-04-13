@@ -39,29 +39,29 @@ The code available under /reproducible_experiments/ in the repository replicates
 
 ### Available Datasets
 
-[Blog](https://archive.ics.uci.edu/ml/datasets/BlogFeedback) BlogFeedback data set.
+* [Blog](https://archive.ics.uci.edu/ml/datasets/BlogFeedback): BlogFeedback data set.
 
-[Bio](https://archive.ics.uci.edu/ml/datasets/Physicochemical+Properties+of+Protein+Tertiary+Structure) Physicochemical  properties  of  protein  tertiary  structure  data  set.
+* [Bio](https://archive.ics.uci.edu/ml/datasets/Physicochemical+Properties+of+Protein+Tertiary+Structure): Physicochemical  properties  of  protein  tertiary  structure  data  set.
 
-[Bike](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset) Bike  sharing  dataset  data  set.
+* [Bike](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset): Bike  sharing  dataset  data  set.
 
-[Community](http://archive.ics.uci.edu/ml/datasets/communities+and+crime) Communities   and   crime   data   set.
+* [Community](http://archive.ics.uci.edu/ml/datasets/communities+and+crime): Communities   and   crime   data   set.
 
-[STAR](https://www.rdocumentation.org/packages/AER/versions/1.2-6/topics/STAR) C.M. Achilles, Helen Pate Bain, Fred Bellott, Jayne Boyd-Zaharias, Jeremy Finn, John Folger, John Johnston, and Elizabeth Word. Tennessee’s Student Teacher Achievement Ratio (STAR) project, 2008.
+* [STAR](https://www.rdocumentation.org/packages/AER/versions/1.2-6/topics/STAR): C.M. Achilles, Helen Pate Bain, Fred Bellott, Jayne Boyd-Zaharias, Jeremy Finn, John Folger, John Johnston, and Elizabeth Word. Tennessee’s Student Teacher Achievement Ratio (STAR) project, 2008.
 
-[Concrete](http://archive.ics.uci.edu/ml/datasets/concrete+compressive+strength) Concrete compressive strength data set.
+* [Concrete](http://archive.ics.uci.edu/ml/datasets/concrete+compressive+strength) Concrete compressive strength data set.
 
-[Facebook Variant 1 and Variant 2](https://archive.ics.uci.edu/ml/datasets/Facebook+Comment+Volume+Dataset) Facebook  comment  volume  data  set.
+* [Facebook Variant 1 and Variant 2](https://archive.ics.uci.edu/ml/datasets/Facebook+Comment+Volume+Dataset): Facebook  comment  volume  data  set.
 
 ### Data subject to copyright/usage rules
 
 The Medical Expenditure Panel Survey (MPES) data can be downloaded following [this explanation](https://github.com/IBM/AIF360/blob/master/aif360/data/raw/meps/README.md) provided in the [IBM's AIF360](https://github.com/IBM/AIF360) github repository.
 
-[MEPS_19](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181) Medical expenditure panel survey,  panel 19. The features and response are extracted using [meps_dataset_panel19_fy2015.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel19_fy2015.py), **excluding** the threshold used to construct binary labels.
+* [MEPS_19](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181): Medical expenditure panel survey,  panel 19. The features and response are extracted using [meps_dataset_panel19_fy2015.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel19_fy2015.py), **excluding** the threshold used to construct binary labels.
 
-[MEPS_20](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181) Medical expenditure panel survey,  panel 20. The features and response are extracted using [meps_dataset_panel20_fy2015.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel20_fy2015.py), **excluding** the threshold used to construct binary labels.
+* [MEPS_20](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181): Medical expenditure panel survey,  panel 20. The features and response are extracted using [meps_dataset_panel20_fy2015.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel20_fy2015.py), **excluding** the threshold used to construct binary labels.
 
-[MEPS_21](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-192) Medical expenditure panel survey,  panel 21. The features and response are extracted using [meps_dataset_panel21_fy2016.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel21_fy2016.py), **excluding** the threshold used to construct binary labels.
+* [MEPS_21](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-192): Medical expenditure panel survey,  panel 21. The features and response are extracted using [meps_dataset_panel21_fy2016.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel21_fy2016.py), **excluding** the threshold used to construct binary labels.
 
 ## License
 
