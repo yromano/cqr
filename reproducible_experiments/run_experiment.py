@@ -24,7 +24,7 @@ if os.path.isdir('/scratch'):
     local_machine = 0
 else:
     local_machine = 1
-    
+
 
 if local_machine:
     base_dataset_path = '/Users/romano/mydata/regression_data/'
@@ -43,16 +43,16 @@ def run_experiment(dataset_name,
 
     Parameters
     ----------
-    
+
     dataset_name : array of strings, list of datasets
-    test_methods : array of strings, list of methods to be tested, estimating 
+    test_methods : array of strings, list of methods to be tested, estimating
                    the 90% prediction interval
     random_state_train_test : integer, random seed to be used
     save_to_csv : boolean, save average length and coverage to csv (True)
                   or not (False)
-    
+
     """
-    
+
     dataset_name_vec = []
     method_vec = []
     coverage_vec = []
@@ -65,7 +65,7 @@ def run_experiment(dataset_name,
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-       
+
     coverage_linear=0
     length_linear=0
     coverage_linear_local=0
@@ -85,12 +85,12 @@ def run_experiment(dataset_name,
     length_cp_qnet=0
     coverage_qnet=0
     length_qnet=0
-    
+
     coverage_cp_re_qnet=0
     length_cp_re_qnet=0
     coverage_re_qnet=0
     length_re_qnet=0
-    
+
     coverage_cp_qforest=0
     length_cp_qforest=0
     coverage_qforest=0
@@ -99,18 +99,18 @@ def run_experiment(dataset_name,
     # determines the size of test set
     test_ratio = 0.2
 
-    # conformal prediction significance level
+    # conformal prediction miscoverage level
     significance = 0.1
-    # desired quanitile levels, used by the quantile regression methods
+    # desired quantile levels, used by the quantile regression methods
     quantiles = [0.05, 0.95]
-    
+
     # Random forests parameters (shared by conditional quantile random forests
     # and conditional mean random forests regression).
     n_estimators = 1000 # usual random forests n_estimators parameter
     min_samples_leaf = 1 # default parameter of sklearn
 
     # Quantile random forests parameters.
-    # See QuantileForestRegressorAdapter class for more details   
+    # See QuantileForestRegressorAdapter class for more details
     quantiles_forest = [5, 95]
     CV_qforest = True
     coverage_factor = 0.85
@@ -121,7 +121,7 @@ def run_experiment(dataset_name,
 
     # Neural network parameters  (shared by conditional quantile neural network
     # and conditional mean neural network regression)
-    # See AllQNet_RegressorAdapter and MSENet_RegressorAdapter in helper.py 
+    # See AllQNet_RegressorAdapter and MSENet_RegressorAdapter in helper.py
     nn_learn_func = torch.optim.Adam
     epochs = 1000
     lr = 0.0005
@@ -130,25 +130,25 @@ def run_experiment(dataset_name,
     dropout = 0.1
     wd = 1e-6
 
-    # Ask for a reduced coverage when tuning the network parameters by 
-    # cross-validataion to avoid too concervative initial estimation of the 
+    # Ask for a reduced coverage when tuning the network parameters by
+    # cross-validation to avoid too conservative initial estimation of the
     # prediction interval. This estimation will be conformalized by CQR.
     quantiles_net = [0.1, 0.9]
 
 
     # local conformal prediction parameter.
-    # See RegressorNc class for more details. 
+    # See RegressorNc class for more details.
     beta = 1
     beta_net = 1
-    
+
     # local conformal prediction parameter. The local ridge regression method
-    # uses nearest neighbor regression as the MAD estimator. 
+    # uses nearest neighbor regression as the MAD estimator.
     # Number of neighbors used by nearest neighbor regression.
     n_neighbors = 11
-    
+
     print(dataset_name)
     sys.stdout.flush()
-    
+
     # load the dataset
     X, y = datasets.GetDataset(dataset_name, base_dataset_path)
 
@@ -158,18 +158,18 @@ def run_experiment(dataset_name,
                                                         test_size=test_ratio,
                                                         random_state=random_state_train_test)
 
-    # zero mean and unit variance scaling of the train and test features 
+    # zero mean and unit variance scaling of the train and test features
     scalerX = StandardScaler()
     scalerX = scalerX.fit(X_train)
     X_train = scalerX.transform(X_train)
     X_test = scalerX.transform(X_test)
-    
+
     # scale the labels by dividing each by the mean absolute response
     max_ytrain = np.mean(np.abs(y_train))
     y_train = y_train/max_ytrain
     y_test = y_test/max_ytrain
 
-    # fit simple ridge regrssion model
+    # fit a simple ridge regression model (sanity check)
     model = linear_model.RidgeCV()
     model = model.fit(X_train, y_train)
     predicted_data = model.predict(X_test).astype(np.float32)
@@ -183,14 +183,14 @@ def run_experiment(dataset_name,
     y_train = np.squeeze(np.asarray(y_train))
     X_test = np.asarray(X_test)
     y_test = np.squeeze(np.asarray(y_test))
-    
+
     # input dimensions
     n_train = X_train.shape[0]
     in_shape = X_train.shape[1]
 
     print("Size: train (%d, %d), test (%d, %d)" % (X_train.shape[0], X_train.shape[1], X_test.shape[0], X_test.shape[1]))
     sys.stdout.flush()
-    
+
     # set seed for splitting the data into proper train and calibration
     np.random.seed(seed)
     idx = np.random.permutation(n_train)
@@ -398,9 +398,9 @@ def run_experiment(dataset_name,
         seed_vec.append(seed)
 
     ################### Rearrangement Quantile Net
-    
+
     if 'rearrangement' in test_methods:
-    
+
         model = helper.AllQNet_RegressorAdapter(model=None,
                                                  fit_params=None,
                                                  in_shape = in_shape,
@@ -456,7 +456,7 @@ def run_experiment(dataset_name,
         coverage_vec.append(coverage_re_qnet)
         length_vec.append(length_re_qnet)
         seed_vec.append(seed)
-        
+
     ################### Quantile Random Forest
 
     if 'quantile_forest' in test_methods:
@@ -535,14 +535,14 @@ def run_experiment(dataset_name,
     print("dataset name: " + dataset_name)
     print(results_)
     sys.stdout.flush()
-    
+
     if save_to_csv:
         results = pd.DataFrame(results)
-    
+
         outdir = './results/'
         if not os.path.exists(outdir):
             os.mkdir(outdir)
-    
+
 
         out_name = outdir + 'results.csv'
         df = pd.DataFrame({'name': dataset_name_vec,

@@ -1,5 +1,5 @@
 ###############################################################################
-# Script for reproducing the results of the experiments in CQR paper
+# Script for reproducing the results in CQR paper
 ###############################################################################
 
 import numpy as np
@@ -35,7 +35,6 @@ for test_method_id in range(6):
             dataset_name = dataset_names[dataset_name_id]
             test_method = test_methods[test_method_id]
             random_state = random_state_train_test[random_state_train_test_id]
-            
+
             # run an experiment and save average results to CSV file
             run_experiment(dataset_name, test_method, random_state)
-            
