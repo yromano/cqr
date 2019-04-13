@@ -37,7 +37,7 @@ Please refer to [real_data_example.ipynb](real_data_example.ipynb) for basic usa
 
 The code available under /reproducible_experiments/ in the repository replicates the experimental results in [1].
 
-### Available Datasets
+### Publicly Available Datasets
 
 * [Blog](https://archive.ics.uci.edu/ml/datasets/BlogFeedback): BlogFeedback data set.
 
@@ -55,7 +55,7 @@ The code available under /reproducible_experiments/ in the repository replicates
 
 ### Data subject to copyright/usage rules
 
-The Medical Expenditure Panel Survey (MPES) data can be downloaded following [this explanation](https://github.com/IBM/AIF360/blob/master/aif360/data/raw/meps/README.md) provided in the [IBM's AIF360](https://github.com/IBM/AIF360) github repository.
+The Medical Expenditure Panel Survey (MPES) data can be downloaded following [this explanation](https://github.com/IBM/AIF360/blob/master/aif360/data/raw/meps/README.md) provided in [IBM's AIF360](https://github.com/IBM/AIF360) github repository.
 
 * [MEPS_19](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181): Medical expenditure panel survey,  panel 19. The features and response are extracted using [meps_dataset_panel19_fy2015.py](https://github.com/IBM/AIF360/blob/master/aif360/datasets/meps_dataset_panel19_fy2015.py), **excluding** the threshold used to construct binary labels.
 
