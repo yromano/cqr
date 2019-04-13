@@ -31,7 +31,7 @@ git clone https://github.com/yromano/cqr.git
 
 ## Usage
 
-Please refer to [real_data_example.ipynb](real_data_example.ipynb) for basic usage. A comparison to competitive methods and additional usage examples of this package can be found in [synthetic_data_example.ipynb](synthetic_data_example.ipynb).
+Please refer to [real_data_example.ipynb](real_data_example.ipynb) for basic usage. Comparisons to competitive methods and additional usage examples of this package can be found in [synthetic_data_example.ipynb](synthetic_data_example.ipynb).
 
 ## Reproducible Research
 
