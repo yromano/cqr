@@ -8,4 +8,4 @@
 
 ## Data subject to copyright/usage rules
 
-Please follow the instruction in the main [README](cqr/README.md), describing how to download and process the MEPS datasets.
+Please follow the instruction in the main [README](https://github.com/yromano/cqr/README.md), describing how to download and process the MEPS datasets.
