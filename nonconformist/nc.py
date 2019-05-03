@@ -197,24 +197,64 @@ class SignErrorErrFunc(RegressionErrFunc):
 		lower = max(min(lower, nc.size - 1), 0)
 		return np.vstack([-nc[lower], nc[upper]])
 
-# CQR error function
+# CQR symmetric error function
 class QuantileRegErrFunc(RegressionErrFunc):
+    """Calculates conformalized quantile regression error.
+    
+    For each correct output in ``y``, nonconformity is defined as
+    
+    .. math::
+        max{\hat{q}_low - y, y - \hat{q}_high}
+    
+    """
     def __init__(self):
         super(QuantileRegErrFunc, self).__init__()
 
     def apply(self, prediction, y):
         y_lower = prediction[:,0]
         y_upper = prediction[:,-1]
-        error_low = y - y_lower
-        error_high = y_upper - y
-        err = abs(error_low)*(error_low<0) + abs(error_high)*(error_high<0)
+        error_low = y_lower - y
+        error_high = y - y_upper
+        err = np.maximum(error_high,error_low)
         return err
 
     def apply_inverse(self, nc, significance):
-        nc = np.sort(nc)[::-1]
-        border = int(np.floor(significance * (nc.size + 1))) - 1
-        border = min(max(border, 0), nc.size - 1)
-        return np.vstack([nc[border], nc[border]])
+        nc = np.sort(nc,0)
+        index = int(np.ceil((1 - significance) * (nc.shape[0] + 1))) - 1
+        index = min(max(index, 0), nc.shape[0] - 1)
+        return np.vstack([nc[index], nc[index]])
+
+# CQR asymmetric error function 
+class QuantileRegAsymmetricErrFunc(RegressionErrFunc):
+    """Calculates conformalized quantile regression asymmetric error function.
+    
+    For each correct output in ``y``, nonconformity is defined as
+    
+    .. math::
+        E_low = \hat{q}_low - y
+        E_high = y - \hat{q}_high
+    
+    """
+    def __init__(self):
+        super(QuantileRegAsymmetricErrFunc, self).__init__()
+
+    def apply(self, prediction, y):
+        y_lower = prediction[:,0]
+        y_upper = prediction[:,-1]
+        
+        error_high = y - y_upper 
+        error_low = y_lower - y
+        
+        err_high = np.reshape(error_high, (y_upper.shape[0],1))
+        err_low = np.reshape(error_low, (y_lower.shape[0],1))
+
+        return np.concatenate((err_low,err_high),1)
+
+    def apply_inverse(self, nc, significance):
+        nc = np.sort(nc,0)
+        index = int(np.ceil((1 - significance / 2) * (nc.shape[0] + 1))) - 1
+        index = min(max(index, 0), nc.shape[0] - 1)
+        return np.vstack([nc[index,0], nc[index,1]])
     
 # -----------------------------------------------------------------------------
 # Base nonconformity scorer
@@ -244,7 +284,7 @@ class RegressorNormalizer(BaseScorer):
 	def fit(self, x, y):
 		residual_prediction = self.base_model.predict(x)
 		residual_error = np.abs(self.err_func.apply(residual_prediction, y))
-		
+
 		######################################################################
 		# Optional: use logarithmic function as in the original implementation
 		# available in https://github.com/donlnz/nonconformist
@@ -253,12 +293,12 @@ class RegressorNormalizer(BaseScorer):
 		# residual_error += 0.00001 # Add small term to avoid log(0)
 		# log_err = np.log(residual_error)
 		######################################################################
-		
+
 		log_err = residual_error
 		self.normalizer_model.fit(x, log_err)
 
 	def score(self, x, y=None):
-		
+
 		######################################################################
 		# Optional: use logarithmic function as in the original implementation
 		# available in https://github.com/donlnz/nonconformist
@@ -266,8 +306,8 @@ class RegressorNormalizer(BaseScorer):
 		# CODE:
 		# norm = np.exp(self.normalizer_model.predict(x))
 		######################################################################
-        
-		norm = self.normalizer_model.predict(x)
+
+		norm = np.abs(self.normalizer_model.predict(x))
 		return norm
 
 

@@ -1,17 +1,24 @@
+
 ###############################################################################
-# Script for reproducing the results in CQR paper
+# Script for reproducing the results of CQR paper
 ###############################################################################
 
 import numpy as np
 from reproducible_experiments.run_experiment import run_experiment
 
 # list methods to test
-test_methods = ['linear_model',
+test_methods = ['linear',
                 'neural_net',
                 'random_forest',
                 'quantile_net',
+                'cqr_quantile_net',
+                'cqr_asymmetric_quantile_net',
                 'rearrangement',
-                'quantile_forest']
+                'cqr_rearrangement',
+                'cqr_asymmetric_rearrangement',
+                'quantile_forest',
+                'cqr_quantile_forest',
+                'cqr_asymmetric_quantile_forest']
 
 # list of datasets
 dataset_names = ['meps_19',
@@ -29,7 +36,7 @@ dataset_names = ['meps_19',
 # vector of random seeds
 random_state_train_test = np.arange(20)
 
-for test_method_id in range(6):
+for test_method_id in range(12):
     for dataset_name_id in range(11):
         for random_state_train_test_id in range(20):
             dataset_name = dataset_names[dataset_name_id]
