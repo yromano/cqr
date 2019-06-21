@@ -34,7 +34,7 @@ def compute_coverage_len(y_test, y_lower, y_upper):
     """
     in_the_range = np.sum((y_test >= y_lower) & (y_test <= y_upper))
     coverage = in_the_range / len(y_test) * 100
-    avg_length = abs(np.mean(y_lower - y_upper))
+    avg_length = np.mean(abs(y_upper - y_lower))
     return coverage, avg_length
 
 def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance):

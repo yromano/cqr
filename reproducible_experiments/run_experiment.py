@@ -163,25 +163,21 @@ def run_experiment(dataset_name,
                                                         test_size=test_ratio,
                                                         random_state=random_state_train_test)
 
-    # scale the labels by dividing each by the mean absolute response
-    max_ytrain = np.mean(np.abs(y_train))
-    y_train = y_train/max_ytrain
-    y_test = y_test/max_ytrain
 
     # fit a simple ridge regression model (sanity check)
     model = linear_model.RidgeCV()
-    model = model.fit(X_train, y_train)
+    model = model.fit(X_train, np.squeeze(y_train))
     predicted_data = model.predict(X_test).astype(np.float32)
 
     # calculate the normalized mean squared error
-    print("Ridge relative error: %f" % (np.sum((y_test-predicted_data)**2)/np.sum(y_test**2)))
+    print("Ridge relative error: %f" % (np.sum((np.squeeze(y_test)-predicted_data)**2)/np.sum(np.squeeze(y_test)**2)))
     sys.stdout.flush()
 
     # reshape the data
     X_train = np.asarray(X_train)
-    y_train = np.squeeze(np.asarray(y_train))
+    y_train = np.asarray(y_train)
     X_test = np.asarray(X_test)
-    y_test = np.squeeze(np.asarray(y_test))
+    y_test = np.asarray(y_test)
 
     # input dimensions
     n_train = X_train.shape[0]
@@ -203,7 +199,13 @@ def run_experiment(dataset_name,
     scalerX = scalerX.fit(X_train[idx_train])
     X_train = scalerX.transform(X_train)
     X_test = scalerX.transform(X_test)
-
+    
+    # scale the labels by dividing each by the mean absolute response
+    mean_ytrain = np.mean(np.abs(y_train[idx_train]))
+    y_train = np.squeeze(y_train)/mean_ytrain
+    y_test = np.squeeze(y_test)/mean_ytrain
+    
+    
     ######################## Linear
 
     if 'linear' == test_method:
