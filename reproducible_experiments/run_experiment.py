@@ -163,12 +163,6 @@ def run_experiment(dataset_name,
                                                         test_size=test_ratio,
                                                         random_state=random_state_train_test)
 
-    # zero mean and unit variance scaling of the train and test features
-    scalerX = StandardScaler()
-    scalerX = scalerX.fit(X_train)
-    X_train = scalerX.transform(X_train)
-    X_test = scalerX.transform(X_test)
-
     # scale the labels by dividing each by the mean absolute response
     max_ytrain = np.mean(np.abs(y_train))
     y_train = y_train/max_ytrain
@@ -203,6 +197,12 @@ def run_experiment(dataset_name,
     # divide the data into proper training set and calibration set
     n_half = int(np.floor(n_train/2))
     idx_train, idx_cal = idx[:n_half], idx[n_half:2*n_half]
+    
+    # zero mean and unit variance scaling of the train and test features
+    scalerX = StandardScaler()
+    scalerX = scalerX.fit(X_train[idx_train])
+    X_train = scalerX.transform(X_train)
+    X_test = scalerX.transform(X_test)
 
     ######################## Linear
 
