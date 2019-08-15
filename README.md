@@ -2,8 +2,7 @@
 
 An important factor to guarantee a responsible use of data-driven recommendation systems is that we should be able to communicate their uncertainty to decision makers. This can be accomplished by constructing prediction intervals, which provide an intuitive measure of the limits of predictive performance.
 
-
-This package contains a Python implementation of conformalized quantile regression [1] methodology. It also implements the equalized coverage framework [2] that builds valid group-conditional prediction intervals.
+This package contains a Python implementation of Conformalized quantile regression (CQR) [1] methodology for constructing marginal distribusion-free prediction intervals. It also implements the equalized coverage framework [2] that builds valid group-conditional prediction intervals.
 
 # Conformalized Quantile Regression [1]
 
