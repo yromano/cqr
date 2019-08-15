@@ -1,6 +1,6 @@
-# Conformal Inference
+# Uncertainty Estimation
 
-This package contains a Python implementation of conformalized quantile regression [1] methodology. It also implements equalized coverage framework, offering a group-conditional coverage guarantee [2].
+This package contains a Python implementation of conformalized quantile regression [1] methodology. It also implements the equalized coverage framework [2] that offers a group-conditional coverage guarantee.
 
 # Conformalized Quantile Regression
 
