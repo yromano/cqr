@@ -45,7 +45,7 @@ Please refer to [cqr_real_data_example.ipynb](cqr_real_data_example.ipynb) for b
 
 ### Equalized Coverage
 
-The notebook [detect_prediction_bias_example.ipynb](prediction_bias_example.ipynb) performs simple data analysis for MEPS 21 data set and detects bias in the prediction. The notebook [equalized_coverage_example.ipynb](equalized_coverage_example.ipynb) illustrates how to run the methods proposed in [2] and construct prediction intervals with equal coverage across groups.
+The notebook [detect_prediction_bias_example.ipynb](detect_prediction_bias_example.ipynb) performs simple data analysis for MEPS 21 data set and detects bias in the prediction. The notebook [equalized_coverage_example.ipynb](equalized_coverage_example.ipynb) illustrates how to run the methods proposed in [2] and construct prediction intervals with equal coverage across groups.
 
 ## Reproducible Research
 
