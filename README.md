@@ -12,7 +12,7 @@ Conformal prediction is a technique for constructing prediction intervals that a
 
 An important factor to guarantee a fair use of data-driven recommendation systems is that we should be able to communicate their uncertainty to decision makers. This can be accomplished by constructing prediction intervals, which provide an intuitive measure of the limits of predictive performance. To support equitable treatment, we force the construction of such intervals to be unbiased in the sense that their coverage must be equal across all protected groups of interest. We present an operational methodology that achieves this goal by offering rigorous distribution-free coverage guarantees holding in finite samples. Our methodology, **equalized coverage**, is flexible as it can be viewed as a wrapper around any predictive algorithm. We test the applicability of the proposed framework on real data, demonstrating that equalized coverage constructs unbiased prediction intervals, unlike competitive methods.
 
-[2] Y. Romano, R. F. Barber, C. Sabbatti and E. J. Candès. [“With malice towards none: Assessing uncertainty via equalized coverage”](https://statweb.stanford.edu/~candes/papers/EqualizedCoverage.pdf) 2019.
+[2] Y. Romano, R. F. Barber, C. Sabbatti and E. J. Candès, [“With malice towards none: Assessing uncertainty via equalized coverage.”](https://statweb.stanford.edu/~candes/papers/EqualizedCoverage.pdf) 2019.
 
 ## Getting Started
 
