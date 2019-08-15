@@ -9,3 +9,5 @@
 ## Data subject to copyright/usage rules
 
 Please follow the instruction in the main [README](https://github.com/yromano/cqr/blob/master/README.md) file, describing how to download and process the MEPS datasets.
+
+Once downloaded, copy the the three files 'meps_19_reg.csv', 'meps_20_reg.csv', and 'meps_21_reg.csv' to this folder. 

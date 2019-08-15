@@ -37,7 +37,7 @@ def compute_coverage_len(y_test, y_lower, y_upper):
     avg_length = np.mean(abs(y_upper - y_lower))
     return coverage, avg_length
 
-def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance):
+def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance, condition=None):
     """ Run split conformal method
 
     Parameters
@@ -50,6 +50,7 @@ def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance):
     idx_train : numpy array, indices of proper training set examples
     idx_cal : numpy array, indices of calibration set examples
     significance : float, significance level (e.g. 0.1)
+    condition : function, mapping feature vector to group id
 
     Returns
     -------
@@ -58,7 +59,7 @@ def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance):
     y_upper : numpy array, estimated upper bound for the labels (n2)
 
     """
-    icp = IcpRegressor(nc)
+    icp = IcpRegressor(nc,condition=condition)
 
     # Fit the ICP using the proper training set
     icp.fit(X_train[idx_train,:], y_train[idx_train])
@@ -71,6 +72,69 @@ def run_icp(nc, X_train, y_train, X_test, idx_train, idx_cal, significance):
 
     y_lower = predictions[:,0]
     y_upper = predictions[:,1]
+
+    return y_lower, y_upper
+
+
+def run_icp_sep(nc, X_train, y_train, X_test, idx_train, idx_cal, significance, condition):
+    """ Run split conformal method, train a seperate regressor for each group
+
+    Parameters
+    ----------
+
+    nc : class of nonconformist object
+    X_train : numpy array, training features (n1Xp)
+    y_train : numpy array, training labels (n1)
+    X_test : numpy array, testing features (n2Xp)
+    idx_train : numpy array, indices of proper training set examples
+    idx_cal : numpy array, indices of calibration set examples
+    significance : float, significance level (e.g. 0.1)
+    condition : function, mapping a feature vector to group id
+
+    Returns
+    -------
+
+    y_lower : numpy array, estimated lower bound for the labels (n2)
+    y_upper : numpy array, estimated upper bound for the labels (n2)
+
+    """
+    
+    X_proper_train = X_train[idx_train,:]
+    y_proper_train = y_train[idx_train]
+    X_calibration = X_train[idx_cal,:]
+    y_calibration = y_train[idx_cal]
+    
+    category_map_proper_train = np.array([condition((X_proper_train[i, :], y_proper_train[i])) for i in range(y_proper_train.size)])
+    category_map_calibration = np.array([condition((X_calibration[i, :], y_calibration[i])) for i in range(y_calibration.size)])
+    category_map_test = np.array([condition((X_test[i, :], None)) for i in range(X_test.shape[0])])
+    
+    categories = np.unique(category_map_proper_train)
+
+    y_lower = np.zeros(X_test.shape[0])
+    y_upper = np.zeros(X_test.shape[0])
+    
+    cnt = 0
+
+    for cond in categories:
+        
+        icp = IcpRegressor(nc[cnt])
+        
+        idx_proper_train_group = category_map_proper_train == cond
+        # Fit the ICP using the proper training set
+        icp.fit(X_proper_train[idx_proper_train_group,:], y_proper_train[idx_proper_train_group])
+    
+        idx_calibration_group = category_map_calibration == cond
+        # Calibrate the ICP using the calibration set
+        icp.calibrate(X_calibration[idx_calibration_group,:], y_calibration[idx_calibration_group])
+    
+        idx_test_group = category_map_test == cond
+        # Produce predictions for the test set, with confidence 90%
+        predictions = icp.predict(X_test[idx_test_group,:], significance=significance)
+    
+        y_lower[idx_test_group] = predictions[:,0]
+        y_upper[idx_test_group] = predictions[:,1]
+        
+        cnt = cnt + 1
 
     return y_lower, y_upper
 
@@ -102,6 +166,67 @@ def compute_coverage(y_test,y_lower,y_upper,significance,name=""):
     print("%s: Average length: %f" % (name, avg_length))
     sys.stdout.flush()
     return coverage, avg_length
+
+def compute_coverage_per_sample(y_test,y_lower,y_upper,significance,name="",x_test=None,condition=None):
+    """ Compute average coverage and length, and print results
+
+    Parameters
+    ----------
+
+    y_test : numpy array, true labels (n)
+    y_lower : numpy array, estimated lower bound for the labels (n)
+    y_upper : numpy array, estimated upper bound for the labels (n)
+    significance : float, desired significance level
+    name : string, optional output string (e.g. the method name)
+    x_test : numpy array, test features
+    condition : function, mapping a feature vector to group id
+
+    Returns
+    -------
+
+    coverage : float, average coverage
+    avg_length : float, average length
+
+    """
+    
+    if condition is not None:
+        
+        category_map = np.array([condition((x_test[i, :], y_test[i])) for i in range(y_test.size)])
+        categories = np.unique(category_map)
+        
+        coverage = np.empty(len(categories), dtype=np.object)
+        length = np.empty(len(categories), dtype=np.object)
+        
+        cnt = 0
+        
+        for cond in categories:
+                        
+            idx = category_map == cond
+            
+            coverage[cnt] = (y_test[idx] >= y_lower[idx]) & (y_test[idx] <= y_upper[idx])
+
+            coverage_avg = np.sum( coverage[cnt] ) / len(y_test[idx]) * 100
+            print("%s: Group %d : Percentage in the range (expecting %.2f): %f" % (name, cond, 100 - significance*100, coverage_avg))
+            sys.stdout.flush()
+        
+            length[cnt] = abs(y_upper[idx] - y_lower[idx])
+            print("%s: Group %d : Average length: %f" % (name, cond, np.mean(length[cnt])))
+            sys.stdout.flush()
+            cnt = cnt + 1
+    
+    else:        
+        
+        coverage = (y_test >= y_lower) & (y_test <= y_upper)
+        coverage_avg = np.sum(coverage) / len(y_test) * 100
+        print("%s: Percentage in the range (expecting %.2f): %f" % (name, 100 - significance*100, coverage_avg))
+        sys.stdout.flush()
+    
+        length = abs(y_upper - y_lower)
+        print("%s: Average length: %f" % (name, np.mean(length)))
+        sys.stdout.flush()
+    
+    return coverage, length
+
 
 def plot_func_data(y_test,y_lower,y_upper,name=""):
     """ Plot the test labels along with the constructed prediction band

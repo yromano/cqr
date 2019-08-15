@@ -4,7 +4,9 @@
 ###############################################################################
 
 import numpy as np
-from reproducible_experiments.run_experiment import run_experiment
+#from reproducible_experiments.run_cqr_experiment import run_experiment
+from run_cqr_experiment import run_experiment
+
 
 # list methods to test
 test_methods = ['linear',

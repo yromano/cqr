@@ -23,6 +23,16 @@ pd.set_option('precision', 3)
 
 base_dataset_path = './datasets/'
 
+if os.path.isdir('/scratch'):
+    local_machine = 0
+else:
+    local_machine = 1
+    
+if local_machine:
+    base_dataset_path = '/Users/romano/mydata/regression_data/'
+else:
+    base_dataset_path = '/scratch/users/yromano/data/regression_data/'
+    
 plot_results = False
 
 

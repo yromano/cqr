@@ -189,13 +189,19 @@ class SignErrorErrFunc(RegressionErrFunc):
 		return (prediction - y)
 
 	def apply_inverse(self, nc, significance):
-		nc = np.sort(nc)[::-1]
-		upper = int(np.floor((significance / 2) * (nc.size + 1)))
-		lower = int(np.floor((1 - significance / 2) * (nc.size + 1)))
-		# TODO: should probably warn against too few calibration examples
-		upper = min(max(upper, 0), nc.size - 1)
-		lower = max(min(lower, nc.size - 1), 0)
-		return np.vstack([-nc[lower], nc[upper]])
+        
+		err_high = -nc
+		err_low = nc
+        
+		err_high = np.reshape(err_high, (nc.shape[0],1))
+		err_low = np.reshape(err_low, (nc.shape[0],1))
+        
+		nc = np.concatenate((err_low,err_high),1)
+        
+		nc = np.sort(nc,0)
+		index = int(np.ceil((1 - significance / 2) * (nc.shape[0] + 1))) - 1
+		index = min(max(index, 0), nc.shape[0] - 1)
+		return np.vstack([nc[index,0], nc[index,1]])
 
 # CQR symmetric error function
 class QuantileRegErrFunc(RegressionErrFunc):

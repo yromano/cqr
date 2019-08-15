@@ -18,7 +18,7 @@ def GetDataset(name, base_path):
     
 	"""
     if name=="meps_19":
-        df = pd.read_csv(base_path + 'meps_19_reg.csv')
+        df = pd.read_csv(base_path + 'meps_19_reg_fix.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
@@ -56,7 +56,7 @@ def GetDataset(name, base_path):
         X = df[col_names].values
         
     if name=="meps_20":
-        df = pd.read_csv(base_path + 'meps_20_reg.csv')
+        df = pd.read_csv(base_path + 'meps_20_reg_fix.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
@@ -94,7 +94,7 @@ def GetDataset(name, base_path):
         X = df[col_names].values
         
     if name=="meps_21":
-        df = pd.read_csv(base_path + 'meps_21_reg.csv')
+        df = pd.read_csv(base_path + 'meps_21_reg_fix.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
