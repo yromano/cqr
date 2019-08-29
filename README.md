@@ -1,16 +1,18 @@
 # Reliable Predictive Inference
 
-This package contains a Python implementation of conformalized quantile regression [1] methodology. It also implements the equalized coverage framework [2] that offers a group-conditional coverage guarantee.
+An important factor to guarantee a responsible use of data-driven recommendation systems is that we should be able to communicate their uncertainty to decision makers. This can be accomplished by constructing prediction intervals, which provide an intuitive measure of the limits of predictive performance.
 
-# Conformalized Quantile Regression
+This package contains a Python implementation of Conformalized quantile regression (CQR) [1] methodology for constructing marginal distribusion-free prediction intervals. It also implements the equalized coverage framework [2] that builds valid group-conditional prediction intervals.
 
-Conformal prediction is a technique for constructing prediction intervals that attain valid coverage in finite samples, without making distributional assumptions. Despite this appeal, existing conformal methods can be unnecessarily conservative because they form intervals of constant or weakly varying length across the input space. **Conformalized quantile regression (CQR)** [1] is a new method that is fully adaptive to heteroscedasticity and often more efficient than other conformal methods. It combines conformal prediction with classical quantile regression, inheriting the advantages of both. CQR is also supported by a theoretical guarantee of valid coverage.
+# Conformalized Quantile Regression [1]
+
+CQR is a technique for constructing prediction intervals that attain valid coverage in finite samples, without making distributional assumptions. It combines the statistical efficiency of quantile regression with the distribution-free coverage guarantee of conformal prediction. On one hand, CQR is flexible in that it can wrap around any algorithm for quantile regression, including random forests and deep neural networks. On the other hand, a key strength of CQR is its rigorous control of the miscoverage rate, independent of the underlying regression algorithm.
 
 [1] Yaniv Romano, Evan Patterson, and Emmanuel J. Candes, [“Conformalized quantile regression.”](https://arxiv.org/abs/1905.03222) 2019.
 
-# Equalized Coverage
+# Equalized Coverage [2]
 
-An important factor to guarantee a fair use of data-driven recommendation systems is that we should be able to communicate their uncertainty to decision makers. This can be accomplished by constructing prediction intervals, which provide an intuitive measure of the limits of predictive performance. To support equitable treatment, we force the construction of such intervals to be unbiased in the sense that their coverage must be equal across all protected groups of interest. We present an operational methodology that achieves this goal by offering rigorous distribution-free coverage guarantees holding in finite samples. Our methodology, **equalized coverage**, is flexible as it can be viewed as a wrapper around any predictive algorithm. We test the applicability of the proposed framework on real data, demonstrating that equalized coverage constructs unbiased prediction intervals, unlike competitive methods.
+To support equitable treatment, the equalized coverage methodology forces the construction of the prediction intervals to be unbiased in the sense that their coverage must be equal across all protected groups of interest. Similar to CQR and conformal inference, equalized coverage offers rigorous distribution-free guarantees that hold in finite samples. This methodology can also be viewed as a wrapper around any predictive algorithm.
 
 [2] Y. Romano, R. F. Barber, C. Sabbatti and E. J. Candès, [“With malice towards none: Assessing uncertainty via equalized coverage.”](https://statweb.stanford.edu/~candes/papers/EqualizedCoverage.pdf) 2019.
 
