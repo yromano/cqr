@@ -71,7 +71,7 @@ The code available under /reproducible_experiments/ in the repository replicates
 
 ### Data subject to copyright/usage rules
 
-The Medical Expenditure Panel Survey (MPES) data can be downloaded using the code in the folder /get_meps_data/ under this repository. It is based on [this explanation](https://github.com/IBM/AIF360/blob/master/aif360/data/raw/meps/README.md) provided by [IBM's AIF360](https://github.com/IBM/AIF360).
+The Medical Expenditure Panel Survey (MPES) data can be downloaded using the code in the folder /get_meps_data/ under this repository. It is based on [this explanation](https://github.com/yromano/cqr/blob/master/get_meps_data/README.md) (code provided by [IBM's AIF360](https://github.com/IBM/AIF360)).
 
 * [MEPS_19](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_detail.jsp?cboPufNumber=HC-181): Medical expenditure panel survey,  panel 19.
 
