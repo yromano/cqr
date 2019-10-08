@@ -43,7 +43,7 @@ git clone https://github.com/yromano/cqr.git
 
 ### CQR
 
-Please refer to [cqr_real_data_example.ipynb](cqr_real_data_example.ipynb) for basic usage. Comparisons to competitive methods and additional usage examples of this package can be found in [cqr_synthetic_data_example.ipynb](cqr_synthetic_data_example.ipynb).
+Please refer to [cqr_real_data_example.ipynb](cqr_real_data_example.ipynb) for basic usage. Comparisons to competitive methods and additional usage examples of this package can be found in [cqr_synthetic_data_example_1.ipynb](cqr_synthetic_data_example_1.ipynb) and [cqr_synthetic_data_example_2.ipynb](cqr_synthetic_data_example_2.ipynb).
 
 ### Equalized Coverage
 
