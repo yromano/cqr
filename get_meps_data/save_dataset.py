@@ -124,7 +124,7 @@ class SaveDataset(RegressionDataset):
                 unprivileged_values = list(set(df[attr]).difference(vals))
             else:
                 # find all instances which match any of the attribute values
-                priv = np.logical_or.reduce(np.equal.outer(vals, df[attr]))
+                priv = np.array([ ( el in vals ) for el in df[attr] ])
                 df.loc[priv, attr] = privileged_values[0]
                 df.loc[~priv, attr] = unprivileged_values[0]
 
