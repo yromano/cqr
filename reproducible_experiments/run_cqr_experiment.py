@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from nonconformist.nc import QuantileRegAsymmetricErrFunc
 
 
-pd.set_option('precision', 3)
+#pd.set_option('precision', 3)
 
 base_dataset_path = './datasets/'
 
@@ -29,12 +29,11 @@ else:
     local_machine = 1
     
 if local_machine:
-    base_dataset_path = '/Users/romano/mydata/regression_data/'
+    base_dataset_path = 'datasets/'
 else:
     base_dataset_path = '/scratch/users/yromano/data/regression_data/'
     
 plot_results = False
-
 
 def run_experiment(dataset_name,
                    test_method,
@@ -61,6 +60,7 @@ def run_experiment(dataset_name,
     seed_vec = []
 
     seed = random_state_train_test
+    print(f"Seed is: {seed}")
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -163,8 +163,8 @@ def run_experiment(dataset_name,
     try:
         # load the dataset
         X, y = datasets.GetDataset(dataset_name, base_dataset_path)
-    except:
-        print("CANNOT LOAD DATASET!")
+    except Exception as e:
+        print(f"CANNOT LOAD DATASET {dataset_name}! Error: {e}")
         return
 
     # Dataset is divided into test and train data based on test_ratio parameter
@@ -217,7 +217,6 @@ def run_experiment(dataset_name,
     
     
     ######################## Linear
-
     if 'linear' == test_method:
 
         model = linear_model.RidgeCV()
@@ -253,7 +252,7 @@ def run_experiment(dataset_name,
     ######################### Neural net
 
     if 'neural_net' == test_method:
-
+        
         model = helper.MSENet_RegressorAdapter(model=None,
                                                fit_params=None,
                                                in_shape = in_shape,
@@ -684,27 +683,36 @@ def run_experiment(dataset_name,
                       columns=results[0,1:])
 
     print("== SUMMARY == ")
-    print("dataset name: " + dataset_name)
-    print(results_)
+
+    ############### Summary & Saving
+
+    # 1. Clean up the console output
+    print(f"\n== ITERATION SUMMARY == ")
+    print(f"Dataset: {dataset_name} | Method: {test_method} | Seed: {seed}")
+    
+    # Create a small DataFrame for just the data collected in this specific function call
+    df_current = pd.DataFrame({
+        'name': dataset_name_vec,
+        'method': method_vec,
+        coverage_str: coverage_vec,
+        'Avg. Length': length_vec,
+        'seed': seed_vec
+    })
+    
+    print(df_current.to_string(index=False))
     sys.stdout.flush()
 
+    # 2. Optimized CSV Saving
     if save_to_csv:
-        results = pd.DataFrame(results)
-
         outdir = './results/'
         if not os.path.exists(outdir):
             os.mkdir(outdir)
+        
+        out_name = os.path.join(outdir, 'results.csv')
 
-        out_name = outdir + 'results.csv'
-
-        df = pd.DataFrame({'name': dataset_name_vec,
-                           'method': method_vec,
-                           coverage_str : coverage_vec,
-                           'Avg. Length' : length_vec,
-                           'seed': seed_vec})
-
+        # If file exists, append without writing the header again
+        # This is much faster than reading the whole CSV first
         if os.path.isfile(out_name):
-            df2 = pd.read_csv(out_name)
-            df = pd.concat([df2, df], ignore_index=True)
-
-        df.to_csv(out_name, index=False)
+            df_current.to_csv(out_name, mode='a', index=False, header=False)
+        else:
+            df_current.to_csv(out_name, index=False)

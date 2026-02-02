@@ -14,7 +14,7 @@ from logging import warning
 import numpy as np
 import pandas as pd
 
-from base_dataset import BaseDataset
+from get_meps_data.base_dataset import BaseDataset
 
 
 class StructuredDataset(BaseDataset):

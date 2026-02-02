@@ -1,7 +1,9 @@
 
 import numpy as np
 import pandas as pd
-
+import os, urllib.request
+from sklearn.impute import SimpleImputer
+import numpy as np 
 
 def GetDataset(name, base_path):
     """ Load a dataset
@@ -18,7 +20,7 @@ def GetDataset(name, base_path):
     
 	"""
     if name=="meps_19":
-        df = pd.read_csv(base_path + 'meps_19_reg_fix.csv')
+        df = pd.read_csv(base_path + 'meps_19_reg.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
@@ -56,7 +58,7 @@ def GetDataset(name, base_path):
         X = df[col_names].values
         
     if name=="meps_20":
-        df = pd.read_csv(base_path + 'meps_20_reg_fix.csv')
+        df = pd.read_csv(base_path + 'meps_20_reg.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
@@ -94,7 +96,7 @@ def GetDataset(name, base_path):
         X = df[col_names].values
         
     if name=="meps_21":
-        df = pd.read_csv(base_path + 'meps_21_reg_fix.csv')
+        df = pd.read_csv(base_path + 'meps_21_reg.csv')
         column_names = df.columns
         response_name = "UTILIZATION_reg"
         column_names = column_names[column_names!=response_name]
@@ -132,7 +134,7 @@ def GetDataset(name, base_path):
         X = df[col_names].values
         
     if name=="star":
-        df = pd.read_csv(base_path + 'STAR.csv')
+        df = pd.read_csv(base_path + 'STAR.csv').astype(object)
         df.loc[df['gender'] == 'female', 'gender'] = 0
         df.loc[df['gender'] == 'male', 'gender'] = 1
         
@@ -271,12 +273,12 @@ def GetDataset(name, base_path):
         
         
     if name=="facebook_1":
-        df = pd.read_csv(base_path + 'facebook/Features_Variant_1.csv')        
+        df = pd.read_csv(base_path + 'facebook/Features_Variant_1.csv')
         y = df.iloc[:,53].values
         X = df.iloc[:,0:53].values        
     
     if name=="facebook_2":
-        df = pd.read_csv(base_path + 'facebook/Features_Variant_2.csv')        
+        df = pd.read_csv(base_path + 'facebook/Features_Variant_2.csv').astype(object)        
         y = df.iloc[:,53].values
         X = df.iloc[:,0:53].values 
         
@@ -288,6 +290,9 @@ def GetDataset(name, base_path):
         
     if name=='blog_data':
         # https://github.com/xinbinhuang/feature-selection_blogfeedback
+        url = "https://media.githubusercontent.com/media/xinbinhuang/feature-selection_blogfeedback/master/data/train/blogData_train.csv"
+        if not os.path.exists(base_path + "blogData_train.csv"): 
+            urllib.request.urlretrieve(url, base_path + "blogData_train.csv")
         df = pd.read_csv(base_path + 'blogData_train.csv', header=None)
         X = df.iloc[:,0:280].values
         y = df.iloc[:,-1].values
@@ -325,21 +330,19 @@ def GetDataset(name, base_path):
         df.columns.to_series().groupby(df.dtypes).groups
         X = df.drop('count',axis=1).values
         y = df['count'].values
-    
     if name=="community":
         # https://github.com/vbordalo/Communities-Crime/blob/master/Crime_v1.ipynb
-        attrib = pd.read_csv(base_path + 'communities_attributes.csv', delim_whitespace = True)
+        attrib = pd.read_csv(base_path + 'communities_attributes.csv', sep='\s+', engine='python')
         data = pd.read_csv(base_path + 'communities.data', names = attrib['attributes'])
         data = data.drop(columns=['state','county',
                           'community','communityname',
-                          'fold'], axis=1)
+                          'fold'])
         
+
         data = data.replace('?', np.nan)
         
         # Impute mean values for samples with missing values        
-        from sklearn.preprocessing import Imputer
-        
-        imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
+        imputer = SimpleImputer(missing_values = np.nan, strategy = 'mean')
         
         imputer = imputer.fit(data[['OtherPerCap']])
         data[['OtherPerCap']] = imputer.transform(data[['OtherPerCap']])
@@ -347,7 +350,6 @@ def GetDataset(name, base_path):
         X = data.iloc[:, 0:100].values
         y = data.iloc[:, 100].values
 
-        
     X = X.astype(np.float32)
     y = y.astype(np.float32)
     

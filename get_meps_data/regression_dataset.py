@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 
-from structured_dataset import StructuredDataset
+from get_meps_data.structured_dataset import StructuredDataset
 
 
 class RegressionDataset(StructuredDataset):

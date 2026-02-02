@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 import pandas as pd
 
 #from standard_datasets import StandardDataset
-from save_dataset import SaveDataset
+from get_meps_data.save_dataset import SaveDataset
 
 default_mappings = {
     'protected_attribute_maps': [{1.0: 'White', 0.0: 'Non-White'}]
@@ -90,7 +90,7 @@ class MEPSDataset20Reg(SaveDataset):
                  na_values=[], custom_preprocessing=default_preprocessing,
                  metadata=default_mappings):
 
-        filepath = './h181.csv'
+        filepath = 'get_meps_data/h181.csv'
 
         df = pd.read_csv(filepath, sep=',', na_values=na_values)
 

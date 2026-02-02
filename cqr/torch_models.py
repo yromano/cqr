@@ -17,7 +17,7 @@ else:
 # Helper functions
 ###############################################################################
 
-def epoch_internal_train(model, loss_func, x_train, y_train, batch_size, optimizer, cnt=0, best_cnt=np.Inf):
+def epoch_internal_train(model, loss_func, x_train, y_train, batch_size, optimizer, cnt=0, best_cnt=np.inf):
     """ Sweep over the data and update the model's parameters
 
     Parameters
