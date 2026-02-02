@@ -3,9 +3,9 @@
 # that accumulates the medical utilization variables without binarization
 
 # Load packages
-from meps_dataset_panel19_fy2015_reg import MEPSDataset19Reg
-from meps_dataset_panel20_fy2015_reg import MEPSDataset20Reg
-from meps_dataset_panel21_fy2016_reg import MEPSDataset21Reg
+from get_meps_data.meps_dataset_panel19_fy2015_reg import MEPSDataset19Reg
+from get_meps_data.meps_dataset_panel20_fy2015_reg import MEPSDataset20Reg
+from get_meps_data.meps_dataset_panel21_fy2016_reg import MEPSDataset21Reg
 
 import numpy as np
 

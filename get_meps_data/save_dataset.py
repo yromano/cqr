@@ -11,7 +11,7 @@ from logging import warning
 import numpy as np
 import pandas as pd
 
-from regression_dataset import RegressionDataset
+from get_meps_data.regression_dataset import RegressionDataset
 
 
 class SaveDataset(RegressionDataset):
@@ -118,13 +118,14 @@ class SaveDataset(RegressionDataset):
             unprivileged_values = [0.]
             if callable(vals):
                 df[attr] = df[attr].apply(vals)
-            elif np.issubdtype(df[attr].dtype, np.number):
+            elif pd.api.types.is_numeric_dtype(df[attr]):
                 # this attribute is numeric; no remapping needed
                 privileged_values = vals
                 unprivileged_values = list(set(df[attr]).difference(vals))
             else:
                 # find all instances which match any of the attribute values
                 priv = np.array([ ( el in vals ) for el in df[attr] ])
+                df[attr] = df[attr].astype(object)
                 df.loc[priv, attr] = privileged_values[0]
                 df.loc[~priv, attr] = unprivileged_values[0]
 
@@ -133,6 +134,17 @@ class SaveDataset(RegressionDataset):
             unprivileged_protected_attributes.append(
                 np.array(unprivileged_values, dtype=np.float64))
 
+        # 7. Fix attirbutes so the class is valid
+        self.feature_names = [c for c in df.columns if c != label_name]
+        self.features = df[self.feature_names].values.astype(np.float64)
+        self.labels = df[[label_name]].values.astype(np.float64)
+        self.label_names = [label_name]
+        self.protected_attributes = df[protected_attribute_names].values.astype(np.float64)
+        self.instance_names = df.index.tolist()
+        self.instance_weights = np.ones((df.shape[0], 1))
+        self.protected_attribute_names = protected_attribute_names
+        self.privileged_protected_attributes = privileged_protected_attributes
+        self.unprivileged_protected_attributes = unprivileged_protected_attributes
         full_name = dataset_name + ".csv"
         print("writing file: " + full_name)
-        df.to_csv(full_name)
+        df.to_csv("datasets/" + full_name)

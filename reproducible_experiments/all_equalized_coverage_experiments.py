@@ -17,10 +17,10 @@ test_ratio_vec = [0.2]
 # vector of random seeds
 random_state_train_test = np.arange(40)
 
-for test_method_id in range(2):
-    for random_state_train_test_id in range(40):
-        for dataset_name_id in range(1):
-            for test_ratio_id in range(1):
+for test_method_id in range(len(test_methods)):
+    for random_state_train_test_id in range(len(random_state_train_test)):
+        for dataset_name_id in range(len(dataset_names)):
+            for test_ratio_id in range(len(test_ratio_vec)):
                 test_ratio = test_ratio_vec[test_ratio_id]
                 test_method = test_methods[test_method_id]
                 random_state = random_state_train_test[random_state_train_test_id]

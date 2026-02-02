@@ -38,12 +38,14 @@ dataset_names = ['meps_19',
 # vector of random seeds
 random_state_train_test = np.arange(20)
 
-for test_method_id in range(12):
-    for dataset_name_id in range(11):
-        for random_state_train_test_id in range(20):
+for test_method_id in range(len(test_methods)):
+    for dataset_name_id in range(len(dataset_names)):
+        for random_state_train_test_id in range(len(random_state_train_test)):
             dataset_name = dataset_names[dataset_name_id]
             test_method = test_methods[test_method_id]
             random_state = random_state_train_test[random_state_train_test_id]
 
             # run an experiment and save average results to CSV file
-            run_experiment(dataset_name, test_method, random_state)
+            run_experiment(dataset_name, test_method, int(random_state))
+
+
