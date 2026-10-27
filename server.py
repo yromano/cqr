@@ -42,15 +42,17 @@ def extract_turnout(raw):
 # silently being presented as the latest election turnout bulletin.
 SOURCES = [
     ("Mako", MAKO),
-    ("Ynet election liveblog", "https://www.ynet.co.il/news/blogs/article/hkbbhw6nzg"),
+    ("Srugim, Oct 27 turnout bulletin", "https://www.srugim.co.il/101014526-%D7%97%D7%A6%D7%99-%D7%9E%D7%94%D7%99%D7%95%D7%9D-%D7%A2%D7%91%D7%A8-%D7%96%D7%94%D7%95-%D7%90%D7%97%D7%95%D7%96-%D7%94%D7%94%D7%A6%D7%91%D7%A2%D7%94-%D7%91%D7%91%D7%97%D7%99%D7%A8%D7%95%D7%AA"),
     ("Kan election updates", "https://www.kan.org.il/umbraco/surface/WhatsHappeningSurface/GetNews"),
+    ("N12 election liveblog", "https://www.mako.co.il/news-israel-elections/2026/liveblog-788cb43830871a1026.htm"),
 ]
 ADDITIONAL_PATTERNS = [
-    # e.g. "אחוז ההצבעה עד השעה 12:00 עומד על 31.5%"
-    (re.compile(r"(?:שיעור|אחוז(?:י)?)\s*ההצבעה(?:\s*הארצי(?:ים)?)?.{0,80}?(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2}).{0,85}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%"), False),
-    # e.g. "31.5% הצביעו עד השעה 12:00"
-    (re.compile(r"(\d{1,2}(?:[.,]\d{1,2})?)\s*%.{0,90}?(?:הצביעו|מבעלי\s*זכות\s*הבחירה).{0,90}?(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2})"), True),
-    (re.compile(r"(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2}).{0,115}?שיעור\s*ההצבעה.{0,90}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%"), False),
+    # "שיעור ההצבעה עד לשעה 12:00 - 31.5%"
+    (re.compile(r"(?:שיעור|אחוז(?:י)?)\s*ההצבעה(?:\s*הארצי(?:ים)?)?.{0,75}?(?:עד\s*(?:ל?ה?שעה)|נכון\s*ל\s*(?:ה?שעה))\s*(\d{1,2}:\d{2})\s*(?:[-–:]|,|עומד(?:ים)?\s+על|הינו|הם)?\s*(\d{1,2}(?:[.,]\d{1,3})?)\s*%"), False),
+    # "אחוז ההצבעה ... עומד על 44.9 אחוז ... עד השעה 14:00"
+    (re.compile(r"(?:שיעור|אחוז(?:י)?)\s*ההצבעה.{0,190}?עומד(?:ים)?\s*על\s*(\d{1,2}(?:[.,]\d{1,3})?)\s*(?:%|אחוז).{0,145}?עד\s*(?:ל?ה?שעה)\s*(\d{1,2}:\d{2})"), True),
+    # "אחוז ההצבעה ... עד השעה 16:00 ... 57.2%"
+    (re.compile(r"(?:שיעור|אחוז(?:י)?)\s*ההצבעה.{0,110}?(?:עד|נכון\s*ל)\s*(?:ל?ה?שעה)\s*(\d{1,2}:\d{2}).{0,120}?(\d{1,2}(?:[.,]\d{1,3})?)\s*%"), False),
 ]
 
 def extract_news(raw):
