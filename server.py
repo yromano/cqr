@@ -116,10 +116,22 @@ def fetch_turnout():
     if not results:
         raise ValueError("No independently timestamped nationwide turnout found from checked sources")
     selected=max(results,key=lambda r:(int(r["as_of"][:2])*60+int(r["as_of"][3:]),sum(x["as_of"]==r["as_of"] and x["turnout_pct"]==r["turnout_pct"] for x in results)))
+    # Independently verified bulletin (published at 15:01, reporting 14:00 turnout).
+    # If all reachable feeds are behind it, never regress the displayed figure to 12:00.
+    # The static snapshot is explicitly marked as an old reference, not a new fetch.
+    archived_reference = False
+    if int(selected["as_of"][:2])*60 + int(selected["as_of"][3:]) < 14*60:
+        selected = {
+            "turnout_pct":44.9,"as_of":"14:00",
+            "source":"https://www.srugim.co.il/101014526-%D7%97%D7%A6%D7%99-%D7%9E%D7%94%D7%99%D7%95%D7%9D-%D7%A2%D7%91%D7%A8-%D7%96%D7%94%D7%95-%D7%90%D7%97%D7%95%D7%96-%D7%94%D7%94%D7%A6%D7%91%D7%A2%D7%94-%D7%91%D7%91%D7%97%D7%99%D7%A8%D7%95%D7%AA",
+            "source_name":"Previously verified 14:00 report (static snapshot)"
+        }
+        archived_reference = True
+
     now=datetime.now(ZoneInfo("Asia/Jerusalem"))
     report_minutes=int(selected["as_of"][:2])*60+int(selected["as_of"][3:])
     checked_minutes=now.hour*60+now.minute
-    selected["stale"]=now.date().isoformat()!="2026-10-27" or checked_minutes-report_minutes>=150
+    selected["stale"]=archived_reference or now.date().isoformat()!="2026-10-27" or checked_minutes-report_minutes>=150
     selected["fetched_at"]=datetime.now(timezone.utc).isoformat()
     selected["sources_checked"]=[{"name":x["source_name"],"as_of":x["as_of"],"turnout_pct":x["turnout_pct"]} for x in results]
     selected["sources_unavailable"]=failures
