@@ -37,13 +37,91 @@ def extract_turnout(raw):
     _, pct, time_of_report = max(found)
     return {"turnout_pct": pct, "as_of": time_of_report, "source": MAKO, "fetched_at": datetime.now(timezone.utc).isoformat()}
 
-def fetch_turnout():
-    req = urllib.request.Request(
-        MAKO+"?nocache="+str(int(time.time())),
-        headers={"User-Agent":"Mozilla/5.0 (compatible; ElectionNightLab/1.0)","Accept":"text/html","Accept-Language":"he-IL,he;q=0.9,en;q=0.8","Cache-Control":"no-cache"}
+
+# A second, independent news mirror prevents a static Mako article from
+# silently being presented as the latest election turnout bulletin.
+SOURCES = [
+    ("Mako", MAKO),
+    ("Ynet election liveblog", "https://www.ynet.co.il/news/blogs/article/hkbbhw6nzg"),
+    ("Kan election updates", "https://www.kan.org.il/umbraco/surface/WhatsHappeningSurface/GetNews"),
+]
+ADDITIONAL_PATTERNS = [
+    # e.g. "אחוז ההצבעה עד השעה 12:00 עומד על 31.5%"
+    (re.compile(r"(?:שיעור|אחוז(?:י)?)\s*ההצבעה(?:\s*הארצי(?:ים)?)?.{0,80}?(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2}).{0,85}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%"), False),
+    # e.g. "31.5% הצביעו עד השעה 12:00"
+    (re.compile(r"(\d{1,2}(?:[.,]\d{1,2})?)\s*%.{0,90}?(?:הצביעו|מבעלי\s*זכות\s*הבחירה).{0,90}?(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2})"), True),
+    (re.compile(r"(?:עד|נכון\s*ל)\s*(?:ה?שעה)\s*(\d{1,2}:\d{2}).{0,115}?שיעור\s*ההצבעה.{0,90}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%"), False),
+]
+
+def extract_news(raw):
+    clean = re.sub(r"(?is)<script\b.*?</script>|<style\b.*?</style>", " ", raw)
+    clean = re.sub(r"(?s)<[^>]*>", " ", clean)
+    clean = re.sub(r"\s+", " ", html.unescape(clean))
+    candidates = []
+    for pattern, reversed_groups in ADDITIONAL_PATTERNS:
+        for m in pattern.finditer(clean):
+            time_text = m.group(2) if reversed_groups else m.group(1)
+            pct_text = m.group(1) if reversed_groups else m.group(2)
+            try:
+                h, minute = map(int, time_text.split(":"))
+                pct = float(pct_text.replace(",", "."))
+            except ValueError:
+                continue
+            context = clean[max(0,m.start()-85):min(len(clean),m.end()+25)]
+            # Explicit exclusions for historical comparisons, army voting and locality reports.
+            segment = m.group(0)
+            if (not 0 <= h < 24 or not 0 <= minute < 60 or not 0 < pct <= 100
+                or re.search(r'צה["״\x27]?ל|משרתי\s+צה', segment)
+                or re.search(r'בבחירות\s+(?:הקודמות|לכנסת\s*ה.25)|ב[-־ ]?2022', segment)):
+                continue
+            if re.search(r'ירושלים|תל\s*אביב|חיפה|בני\s*ברק|ראשון\s*לציון', segment) and 'הארצי' not in segment:
+                continue
+            candidates.append((h*60+minute, pct, f"{h:02d}:{minute:02d}"))
+    if not candidates:
+        raise ValueError("No expressly timestamped nationwide turnout observation")
+    _, pct, when = max(candidates, key=lambda z: z[0])
+    return {"turnout_pct":pct,"as_of":when}
+
+def _fetch_single(name, url):
+    req=urllib.request.Request(
+        url + ("&" if "?" in url else "?") + "nocache=" + str(int(time.time())),
+        headers={"User-Agent":"Mozilla/5.0 (compatible; ElectionNightLab/1.1)","Accept":"text/html, application/json","Accept-Language":"he-IL,he;q=0.9","Cache-Control":"no-cache"}
     )
-    with urllib.request.urlopen(req, timeout=12) as resp:
-        return extract_turnout(resp.read(1750000).decode("utf-8", errors="replace"))
+    with urllib.request.urlopen(req,timeout=9) as response:
+        raw=response.read(1900000).decode("utf-8",errors="replace")
+    try:
+        result=extract_news(raw)
+    except ValueError:
+        # Retain the tested, stricter Mako-specific parser as another route.
+        if name!="Mako":
+            raise
+        result=extract_turnout(raw)
+    result.update({"source":url,"source_name":name})
+    return result
+
+def fetch_turnout():
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from zoneinfo import ZoneInfo
+    results = []
+    failures = []
+    with ThreadPoolExecutor(max_workers=len(SOURCES)) as pool:
+        tasks = {pool.submit(_fetch_single,name,url):name for name,url in SOURCES}
+        for future in as_completed(tasks):
+            try:
+                results.append(future.result())
+            except Exception as exc:
+                failures.append({"source":tasks[future],"error":str(exc)[:120]})
+    if not results:
+        raise ValueError("No independently timestamped nationwide turnout found from checked sources")
+    selected=max(results,key=lambda r:(int(r["as_of"][:2])*60+int(r["as_of"][3:]),sum(x["as_of"]==r["as_of"] and x["turnout_pct"]==r["turnout_pct"] for x in results)))
+    now=datetime.now(ZoneInfo("Asia/Jerusalem"))
+    report_minutes=int(selected["as_of"][:2])*60+int(selected["as_of"][3:])
+    checked_minutes=now.hour*60+now.minute
+    selected["stale"]=now.date().isoformat()!="2026-10-27" or checked_minutes-report_minutes>=150
+    selected["fetched_at"]=datetime.now(timezone.utc).isoformat()
+    selected["sources_checked"]=[{"name":x["source_name"],"as_of":x["as_of"],"turnout_pct":x["turnout_pct"]} for x in results]
+    selected["sources_unavailable"]=failures
+    return selected
 
 class Handler(BaseHTTPRequestHandler):
     def respond(self, status, kind, body):
